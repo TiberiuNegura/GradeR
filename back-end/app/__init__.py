@@ -14,4 +14,7 @@ def create_app():
     from app.routes.web_routes import web_bp
     app.register_blueprint(web_bp)
 
+    from app.api import api_bp
+    app.register_blueprint(api_bp)
+
     return app
