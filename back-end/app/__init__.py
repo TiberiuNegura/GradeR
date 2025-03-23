@@ -11,4 +11,7 @@ def create_app():
 
     app.secret_key = os.getenv('SECRET_KEY')
 
+    from app.routes.web_routes import web_bp
+    app.register_blueprint(web_bp)
+
     return app
