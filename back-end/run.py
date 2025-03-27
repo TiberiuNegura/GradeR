@@ -1,7 +1,11 @@
-from flask import Flask, jsonify, Response
+import json
+import os
+
+from flask import Flask, jsonify, Response, request
 from flask_cors import CORS
 
 import config
+from models.user import User
 
 app: Flask = Flask(__name__)
 
@@ -9,13 +13,37 @@ CORS(app)
 
 app.config['UPLOAD_FOLDER'] = config.UPLOAD_FOLDER
 
+USERS_FILE = 'users.json'
 
-def is_param_valid(json_data: any, property_name: str) -> (bool, float):
-    data: any = json_data[property_name]
-    if data is not None:
-        return True, json_data[property_name]
 
-    return False, 0
+@app.route('/api/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return build_response('Username and password required', 400)
+
+    if User.get_by_username(email):
+        return build_response('Username already exists', 409)
+
+    new_user = User(email=email, password=password)
+    User.save(new_user)
+    return build_response('User created successfully', 201)
+
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+
+    user_data = User.get_by_username(email)
+    if not user_data or not User(**user_data).verify_password(password):
+        return build_response('Invalid credentials', 401)
+
+    return build_response('Login successful', 200)
 
 
 def build_response(message: str, code: int) -> Response:
@@ -28,22 +56,9 @@ def build_response(message: str, code: int) -> Response:
     return response
 
 
-def check_method(desired_method: str, method: str) -> (Response, bool):
-    if desired_method != method:
-        return build_response('Method not allowed', 500), False
-
-    return build_response('', 200), True
-
-
-def get_text_from_file(filename: str) -> str:
-    with open(filename, 'r', encoding='utf-8') as file:
-        return file.read()
-
-
-@app.route('/')
-def index():
-    return "Welcome to the Flask app!"
-
-
 if __name__ == '__main__':
+    if not os.path.exists('users.json'):
+        with open('users.json', 'w') as f:
+            json.dump({}, f)
+
     app.run(host='0.0.0.0', port=5000, debug=True)
