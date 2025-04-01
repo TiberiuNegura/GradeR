@@ -371,3 +371,23 @@ body {
     cursor: not-allowed;
     transform: translateX(0);
 }
+
+.role-select {
+    display: block;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    font-size: 16px;
+    line-height: 40px;
+    color: #3b4465;
+    background: #eef9fe;
+    border: 1px solid #cddbef;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.role-select:focus {
+    border-color: #a7e245;
+    outline: none;
+    box-shadow: 0 0 5px rgba(167, 226, 69, 0.3);
+}

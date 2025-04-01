@@ -46,6 +46,13 @@
                             <label for="signup-password-confirm">Confirm password</label>
                             <input id="signup-password-confirm" type="password" required name="confirmPassword" ngModel>
                         </div>
+                        <div class="input-block">
+                            <label for="signup-role">Role</label>
+                            <select id="signup-role" required name="role" ngModel class="role-select">
+                                <option value="student">Student</option>
+                                <option value="teacher">Teacher</option>
+                            </select>
+                        </div>                        
                     </fieldset>
                     <button type="submit" class="btn-signup">Continue</button>
                 </form>
