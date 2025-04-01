@@ -1,10 +1,18 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-import json
+import psycopg2
 import os
 import uuid
 
+# In caz ca nu va merg comenzile din psycopg2: pip install psycopg2
 
-#conectezi aici la database lefter in loc de json
+# Verificati si inlocuiti cu valorile pe care le aveti voi daca sunt diferite, la mine asa erau default
+conn = psycopg2.connect(
+    host="localhost",
+    database="gradeR",
+    user="postgres",
+    password="1q2w3e"
+)
+
 class User:
     def __init__(self, email, password):
         self.email = email
@@ -27,15 +35,33 @@ class User:
 
     @staticmethod
     def get_all():
-        if not os.path.exists('users.json'):
-            return {}
-        with open('users.json', 'r') as f:
-            return json.load(f)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM user")
+        
+        data = cursor.fetchall()
+        
+        cursor.close()
+        if data:
+            return data.__dict__    
+
 
     @staticmethod
-    def _save_to_file(users):
-        with open('users.json', 'w') as f:
-            json.dump(users, f, indent=4)
+    def _save_to_db(users):
+        cursor = conn.cursor()
+
+        try:
+            columns = ', '.join(users.keys())
+            values = ', '.join(['%s'] * len(users)) 
+            sql = f"INSERT INTO user ({columns}) VALUES ({values})"
+
+            cursor.execute(sql, tuple(users.values()))
+
+            conn.commit()
+        except psycopg2.Error as e:
+            print(f"Encountered an error: {e}")
+        finally:
+            cursor.close
+            conn.close()
 
     def verify_password(self, password):
         return check_password_hash(self.password, password)
