@@ -13,6 +13,7 @@ conn = psycopg2.connect(
     password="1q2w3e"
 )
 
+
 class User:
     def __init__(self, email, password):
         self.email = email
@@ -37,13 +38,12 @@ class User:
     def get_all():
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM user")
-        
+
         data = cursor.fetchall()
-        
+
         cursor.close()
         if data:
-            return data.__dict__    
-
+            return data.__dict__
 
     @staticmethod
     def _save_to_db(users):
@@ -51,7 +51,7 @@ class User:
 
         try:
             columns = ', '.join(users.keys())
-            values = ', '.join(['%s'] * len(users)) 
+            values = ', '.join(['%s'] * len(users))
             sql = f"INSERT INTO user ({columns}) VALUES ({values})"
 
             cursor.execute(sql, tuple(users.values()))

@@ -16,6 +16,16 @@ app.config['UPLOAD_FOLDER'] = config.UPLOAD_FOLDER
 USERS_FILE = 'users.json'
 
 
+def build_response(message: str, code: int) -> Response:
+    response = jsonify({
+        'message': message,
+        'code': code
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
+    return response
+
+
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -44,16 +54,6 @@ def login():
         return build_response('Invalid credentials', 401)
 
     return build_response('Login successful', 200)
-
-
-def build_response(message: str, code: int) -> Response:
-    response = jsonify({
-        'message': message,
-        'code': code
-    })
-    response.headers.add('Access-Control-Allow-Origin', '*')
-
-    return response
 
 
 if __name__ == '__main__':

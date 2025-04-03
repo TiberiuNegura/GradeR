@@ -9,16 +9,16 @@
                     Login
                     <span class="underline"></span>
                 </button>
-                <form class="form form-login" (ngSubmit)="onSubmit('login', loginForm.value)" #loginForm="ngForm">
+                <form class="form form-login" (ngSubmit)="onSubmit()" #loginForm="ngForm">
                     <fieldset>
                         <legend>Please, enter your email and password for login.</legend>
                         <div class="input-block">
                             <label for="login-email">E-mail</label>
-                            <input id="login-email" type="email" required name="email" ngModel>
+                            <input id="login-email" type="email" required name="email" [(ngModel)]="loginModel.email">
                         </div>
                         <div class="input-block">
                             <label for="login-password">Password</label>
-                            <input id="login-password" type="password" required name="password" ngModel>
+                            <input id="login-password" type="password" required name="password" [(ngModel)]="loginModel.password">
                         </div>
                     </fieldset>
                     <button type="submit" class="btn-login">Login</button>
@@ -31,26 +31,34 @@
                     Register
                     <span class="underline"></span>
                 </button>
-                <form class="form form-signup" (ngSubmit)="onSubmit('signup', signupForm.value)" #signupForm="ngForm">
+                <form class="form form-signup" (ngSubmit)="onSubmit()" #signupForm="ngForm">
                     <fieldset>
                         <legend>Please, enter your email, password and password confirmation for sign up.</legend>
                         <div class="input-block">
+                            <label for="signup-name">Last name</label>
+                            <input id="signup-name" type="text" required name="name" [(ngModel)]="registerModel.lastName">
+                        </div>
+                        <div class="input-block">
+                            <label for="signup-first-name">First name</label>
+                            <input id="signup-first-name" type="text" required name="first-name" [(ngModel)]="registerModel.firstName">
+                        </div>
+                        <div class="input-block">
                             <label for="signup-email">E-mail</label>
-                            <input id="signup-email" type="email" required name="email" ngModel>
+                            <input id="signup-email" type="email" required name="email" [(ngModel)]="registerModel.email">
                         </div>
                         <div class="input-block">
                             <label for="signup-password">Password</label>
-                            <input id="signup-password" type="password" required name="password" ngModel>
+                            <input id="signup-password" type="password" required name="password" [(ngModel)]="registerModel.password">
                         </div>
                         <div class="input-block">
                             <label for="signup-password-confirm">Confirm password</label>
-                            <input id="signup-password-confirm" type="password" required name="confirmPassword" ngModel>
+                            <input id="signup-password-confirm" type="password" required name="confirmPassword" [(ngModel)]="confirmPwd">
                         </div>
                         <div class="input-block">
                             <label for="signup-role">Role</label>
-                            <select id="signup-role" required name="role" ngModel class="role-select">
-                                <option value="student">Student</option>
-                                <option value="teacher">Teacher</option>
+                            <select id="signup-role" required name="role" [(ngModel)]="registerModel.role" class="role-select">
+                                <option value="false">Student</option>
+                                <option value="true">Teacher</option>
                             </select>
                         </div>                        
                     </fieldset>

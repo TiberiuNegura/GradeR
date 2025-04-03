@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   searchQuery: string = '';
   currentYear: number = new Date().getFullYear();
   isTeacher: boolean = true;
@@ -130,10 +130,18 @@ export class HomeComponent {
     }
   ];
   
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute
+  ) { }
   
   ngOnInit(): void {
-    // Any initialization logic
+    this.route.queryParams.subscribe(params => {
+      const role = params['role'] === 'true';
+      console.log('Role:', role);
+
+      this.isTeacher = role;
+    });
   }
   
   performSearch(): void {
