@@ -10,6 +10,7 @@ body {
     margin: 0;
     font-family: Roboto, -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
     background: #3b4465;
+    height: 100%;
 }
 
 .forms-section {
@@ -17,6 +18,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    background: #3b4465;
 }
 
 .section-title {
