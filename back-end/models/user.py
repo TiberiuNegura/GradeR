@@ -63,5 +63,25 @@ class User:
             cursor.close
             conn.close()
 
+    @staticmethod
+    def get_student_grades(student_id):
+
+        cursor = conn.cursor()
+        query = """
+            SELECT 
+                g.id_grade, 
+                g.value, 
+                g.date,
+                d.name AS discipline_name
+            FROM grade AS g
+            JOIN discipline AS d ON g.id_discipline = d.id_discipline
+            WHERE g.id_student = %s;
+        """
+        cursor.execute(query, (student_id,))
+
+        grades = cursor.fetchall()
+        cursor.close()
+        return grades
+
     def verify_password(self, password):
         return check_password_hash(self.password, password)
