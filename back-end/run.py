@@ -56,6 +56,30 @@ def login():
     return build_response('Login successful', 200)
 
 
+@app.route('/api/grades', methods=['POST'])
+def get_grades():
+    data = request.get_json()
+    user_id = data.get('id')
+
+    if not user_id:
+        return build_response('User id and password required', 400)
+
+    grades = User.get_student_grades(user_id)
+    grade_list = []
+    for grade in grades:
+        grade_dict = {
+            "id_grade": grade[0],
+            "value": grade[1],
+            "date": grade[2].isoformat() if grade[2] else None,
+            "discipline": grade[3]
+        }
+        grade_list.append(grade_dict)
+
+    grade_list_str = json.dumps(grade_list)
+
+    return build_response(grade_list_str, 200)
+
+
 if __name__ == '__main__':
     if not os.path.exists('users.json'):
         with open('users.json', 'w') as f:
