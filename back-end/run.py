@@ -80,6 +80,65 @@ def get_grades():
     return build_response(grade_list_str, 200)
 
 
+@app.route('/api/grades/add', methods=['POST'])
+def add_grade_endpoint():
+    data = request.get_json()
+    teacher_id = data.get('teacher_id')
+    student_id = data.get('student_id')
+    discipline_id = data.get('discipline_id')
+    value = data.get('value')
+    grade_date = data.get('date')
+
+    if not (teacher_id and student_id and discipline_id and value is not None):
+        return build_response("Missing required parameters", 400)
+
+    teacher_data = User.get_by_id(teacher_id)
+
+    if not teacher_data:
+        return build_response("Invalid teacher credentials", 401)
+    if not teacher_data.get("is_teacher"):
+        return build_response("User is not a teacher", 403)
+
+    teacher_instance = User(**teacher_data)
+    assigned, error_message = teacher_instance.is_assigned_to_discipline(discipline_id)
+
+    if not assigned:
+        if error_message == "Discipline not found":
+            return build_response(error_message, 404)
+        else:
+            return build_response(error_message, 403)
+
+    try:
+        User.add_grade_record(student_id, discipline_id, value, grade_date)
+    except Exception as e:
+        return build_response(f"Error adding grade: {e}", 500)
+
+    return build_response("Grade added successfully", 201)
+
+
+@app.route('/api/grades/teacher', methods=['POST'])
+def view_student_grades():
+    data = request.get_json()
+    teacher_id = data.get('teacher_id')
+
+    if not teacher_id:
+        return build_response("Teacher credentials required", 400)
+
+    teacher_data = User.get_by_id(teacher_id)
+
+    if not teacher_data:
+        return build_response("Invalid teacher credentials", 401)
+    if not teacher_data.get("is_teacher"):
+        return build_response("User is not a teacher", 403)
+
+    teacher_instance = User(**teacher_data)
+    grade_list = teacher_instance.get_all_student_grades()
+
+    grade_list_str = json.dumps(grade_list)
+
+    return build_response(grade_list_str, 200)
+
+
 if __name__ == '__main__':
     if not os.path.exists('users.json'):
         with open('users.json', 'w') as f:
