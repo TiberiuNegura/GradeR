@@ -31,6 +31,10 @@ def register():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
+    role = data.get('role')
+    firstName = data.get('firstName')
+    lastName = data.get('lastName')
+
 
     if not email or not password:
         return build_response('Username and password required', 400)
@@ -38,7 +42,7 @@ def register():
     if User.get_by_username(email):
         return build_response('Username already exists', 409)
 
-    new_user = User(email=email, password=password)
+    new_user = User(email=email, password=password, role=role, firstName=firstName, lastName=lastName)
     User.save(new_user)
     return build_response('User created successfully', 201)
 

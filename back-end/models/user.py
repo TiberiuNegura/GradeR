@@ -17,9 +17,12 @@ conn = psycopg2.connect(
 
 
 class User:
-    def __init__(self, email, password):
+    def __init__(self, email, password, role, firstName, lastName):
         self.email = email
         self.password = generate_password_hash(password)
+        self.role = role
+        self.firstName = firstName
+        self.lastName = lastName
         self.id = str(uuid.uuid4())
 
     @staticmethod
