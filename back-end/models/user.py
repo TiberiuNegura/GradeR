@@ -88,7 +88,44 @@ class User:
         cursor.close()
         return grades
 
-    def get_student_grades_by_teacher(studentId, teacher_id):
+    def get_user_id(email):
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT id_user FROM user WHERE email = %s", (email))
+
+        result = cursor.fetchone()
+
+        cursor.close()
+
+        return result[0]
+
+    def get_last_name(user_id):
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT last_name FROM user WHERE id_user = %s", (user_id))
+
+        result = cursor.fetchone()
+
+        cursor.close()
+
+        return result[0]
+
+    def is_teacher(email):
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT is_teacher FROM user WHERE email = %s;", (email))
+
+        result = cursor.fetchone()
+
+        cursor.close()
+
+        if result is not None:
+            return result[0] 
+        else:
+            return None 
+
+
+    def get_student_grades_by_teacher(student_id, teacher_id):
         
         cursor = conn.cursor()
         query = """
@@ -111,7 +148,7 @@ class User:
                 AND t.id_user = %s;
         """
 
-        cursor.execute(query, (studentId,teacher_id))
+        cursor.execute(query, (student_id,teacher_id))
         
         grades = cursor.fetchall()
 
@@ -138,6 +175,8 @@ class User:
         cursor.execute(query, (student_id, discipline_id))
 
         grades = cursor.fetchall()
+
+        cursor.close()
 
         return grades
 
@@ -169,6 +208,50 @@ class User:
                 "discipline_id": row[4],
                 "discipline": row[5]
             })
+        return grade_list
+
+    def get_all_disciplines(self, user_id, is_teacher):
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM discipline")
+
+        data = cursor.fetchall()
+
+        discipline_list = []
+
+        for row in data:
+            owns_discipline = False
+            if is_teacher:
+                owns_discipline = row[1] == user_id
+            discipline_list.append({
+                "id_discipline": row[0],
+                "name": row[2],  
+                "teacher": self.get_last_name(row[1]),
+                "owns_discipline": owns_discipline 
+            })
+
+        cursor.close()
+
+        return discipline_list
+
+    def get_student_grade_by_name(discipline_id, student_id):
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * from grade WHERE id_student = %s AND id_discipline = %s ", (student_id, discipline_id))
+
+        data = cursor.fetchall()
+
+        cursor.close()
+
+        grade_list = []
+
+        for row in data:
+            grade_list.append({
+                "id": row[0],
+                "value": row[3],
+                "date": row[4]
+            })
+
         return grade_list
 
     @staticmethod
