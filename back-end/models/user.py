@@ -88,6 +88,59 @@ class User:
         cursor.close()
         return grades
 
+    def get_student_grades_by_teacher(studentId, teacher_id):
+        
+        cursor = conn.cursor()
+        query = """
+            SELECT 
+                d.name AS discipline_name, 
+                g.value AS grade_value, 
+                g.date AS grade_date, 
+                t.first_name || ' ' || t.last_name AS teacher_name
+            FROM 
+                grade g
+            JOIN 
+                user u ON g.id_student = u.id_user
+            JOIN 
+                discipline d ON g.id_discipline = d.id_discipline
+            JOIN 
+                user t ON d.id_teacher = t.id_user
+            WHERE 
+                g.id_student = %s 
+                AND t.is_teacher = true 
+                AND t.id_user = %s;
+        """
+
+        cursor.execute(query, (studentId,teacher_id))
+        
+        grades = cursor.fetchall()
+
+        return grades
+    
+    def get_student_grades_by_discipline(student_id, discipline_id):
+
+        cursor = conn.cursor()
+        query = """
+            SELECT 
+                g.value,
+                g.date,
+                d.name,
+                t.first_name || ' ' || t.last_name AS teacher_name
+            FROM grade g
+            JOIN discipline d ON g.id_discipline = d.id_discipline
+            JOIN user t ON d.id_teacher = t.id_user
+            WHERE 
+                g.id_student = %s AND 
+                t.is_teacher = TRUE AND
+                d.id_discipline = %s;
+        """
+
+        cursor.execute(query, (student_id, discipline_id))
+
+        grades = cursor.fetchall()
+
+        return grades
+
     def get_all_student_grades(self):
         cursor = conn.cursor()
         query = """

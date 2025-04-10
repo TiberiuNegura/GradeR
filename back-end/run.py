@@ -83,6 +83,53 @@ def get_grades():
 
     return build_response(grade_list_str, 200)
 
+@app.route('/api/grades/by-teacher', methods=['POST'])
+def filter_grades_by_teacher():
+    data = request.get_json()
+    user_id = data.get('id')
+    teacher_id = data.get('teacher_id')
+
+    if not user_id or not teacher_id:
+        return build_response('User id and teacher required', 400)
+
+    grades = User.get_student_grades_by_teacher(user_id, teacher_id)
+
+    grade_list = []
+    for grade in grades:
+        grade_dict = {
+            "discipline": grade[0],
+            "value": grade[1],
+            "date": grade[2].isoformat() if grade[2] else None,
+            "teacher": grade[3]
+        }
+        grade_list.append(grade_dict)
+
+    return build_response(json.dumps(grade_list), 200)
+
+
+@app.route('/api/grades/by-discipline', methods=['POST'])
+def filter_grades_by_discipline():
+    data = request.get_json()
+    user_id = data.get('id')
+    discipline_id = data.get('discipline_id')
+
+
+    if not user_id or not discipline_id:
+        return build_response('User id and discipline required', 400)
+
+    grades = User.get_student_grades_by_discipline(user_id, discipline_id)
+
+    grade_list = []
+    for grade in grades:
+        grade_dict = {
+            "discipline": grade[0],
+            "value": grade[1],
+            "date": grade[2].isoformat() if grade[2] else None,
+            "teacher": grade[3]
+        }
+        grade_list.append(grade_dict)
+
+    return build_response(json.dumps(grade_list), 200)
 
 @app.route('/api/grades/add', methods=['POST'])
 def add_grade_endpoint():
