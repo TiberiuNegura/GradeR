@@ -57,7 +57,14 @@ def login():
     if not user_data or not User(**user_data).verify_password(password):
         return build_response('Invalid credentials', 401)
 
-    return build_response('Login successful', 200)
+    response = jsonify({
+        'userId': User.get_user_id(email),
+        'isTeacher': 't' if User.is_teacher(email) else 'f',
+        'code': 200
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
+    return response
 
 
 @app.route('/api/grades', methods=['POST'])
