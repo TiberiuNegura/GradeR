@@ -44,7 +44,14 @@ def register():
 
     new_user = User(email=email, password=password, role=role, firstName=firstName, lastName=lastName)
     User.save(new_user)
-    return build_response('User created successfully', 201)
+
+    response = jsonify({
+        'userId': new_user.id,
+        'isTeacher': 'true' if User.is_teacher(email) else 'false',
+        'code': 200
+    })
+
+    return response
 
 
 @app.route('/api/login', methods=['POST'])
@@ -59,7 +66,7 @@ def login():
 
     response = jsonify({
         'userId': User.get_user_id(email),
-        'isTeacher': 't' if User.is_teacher(email) else 'f',
+        'isTeacher': 'true' if User.is_teacher(email) else 'false',
         'code': 200
     })
     response.headers.add('Access-Control-Allow-Origin', '*')
