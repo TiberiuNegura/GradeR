@@ -52,8 +52,16 @@
                         </div>
                         <div class="input-block">
                             <label for="signup-password-confirm">Confirm password</label>
-                            <input id="signup-password-confirm" type="password" required name="confirmPassword" [(ngModel)]="confirmPwd">
-                        </div>
+                            <input
+                              id="signup-password-confirm"
+                              type="password"
+                              required
+                              name="confirmPassword"
+                              [(ngModel)]="confirmPwd"
+                              [class.error]="passwordMismatch"
+                            >
+                            <small *ngIf="passwordMismatch" class="error-message">Passwords do not match</small>
+                          </div>                          
                         <div class="input-block">
                             <label for="signup-role">Role</label>
                             <select id="signup-role" required name="role" [(ngModel)]="registerModel.role" class="role-select">

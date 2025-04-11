@@ -32,6 +32,7 @@ export class AuthComponent {
   };
 
   confirmPwd: string = '';
+  passwordMismatch: boolean = false;
 
 
   constructor(
@@ -50,42 +51,35 @@ export class AuthComponent {
       console.log(`email: ${this.loginModel.email}, pwd; ${this.loginModel.password}`);
       this.api.login(this.loginModel)
         .subscribe({
-          next: () => {
-            // i need to query user's role here
-            this.router.navigate(['/home'], { queryParams: { role: false } });
+          next: (data: any) => {
+            let isTeacher: boolean = data.isTeacher == 'true';
+            localStorage.setItem('id', data.userId);
+            this.router.navigate(['/home'], { queryParams: { role: isTeacher } });
           },
           error: (err) => {
             console.error(err);
-            this.router.navigate(['/home'], { queryParams: { role: false } });
           }
-
         });
     } else {
       if (this.registerModel.password != this.confirmPwd) {
+        this.passwordMismatch = true;
         console.error("passwords do not match");
+        return;
+      } else {
+        this.passwordMismatch = false;
       }
-      console.log(
-        `email: ${this.registerModel.email}\n
-        pwd: ${this.registerModel.password}\n
-        first name: ${this.registerModel.firstName}\n
-        last name: ${this.registerModel.lastName}\n
-        role: ${this.registerModel.role}
-        `);
+
       this.api.register(this.registerModel)
         .subscribe({
-          next: () => {
-            this.router.navigate(['/home']);
+          next: (data: any) => {
             this.router.navigate(['/home'], { queryParams: { role: this.registerModel.role } });
-
+            localStorage.setItem('id', data.userId)
           },
           error: (err) => {
             console.error(err);
-            this.router.navigate(['/home'], { queryParams: { role: this.registerModel.role } });
           }
 
         });
     }
-
-    // untill the backend is full up
   }
 }

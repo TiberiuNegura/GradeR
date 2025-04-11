@@ -393,3 +393,39 @@ body {
     outline: none;
     box-shadow: 0 0 5px rgba(167, 226, 69, 0.3);
 }
+
+input.error {
+    border-color: #ff4d4f;
+    background-color: #fff0f0;
+    animation: shake 0.3s;
+}
+
+.error-message {
+    color: #ff4d4f;
+    font-size: 12px;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Add a subtle shake animation */
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-4px);
+    }
+
+    50% {
+        transform: translateX(4px);
+    }
+
+    75% {
+        transform: translateX(-4px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}

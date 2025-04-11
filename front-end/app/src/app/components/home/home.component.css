@@ -1,111 +1,113 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600&display=swap');
 
+/* General Reset */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Roboto', -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
-    transition: all 0.3s ease-in-out;
 }
 
-html,
-body {
-    height: 100%;
-    margin: 0;
-    scroll-behavior: smooth;
-}
-
+/* Body and Wrapper */
 body {
     background: linear-gradient(135deg, #3b4465 0%, #2a324b 100%);
     padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
     min-height: 100vh;
+    color: #333;
 }
 
+/* Header */
 .header {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     color: white;
     padding: 18px 25px;
     border-radius: 12px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(10px);
     margin-bottom: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
 .logo {
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 600;
-    letter-spacing: 0.5px;
     background: linear-gradient(45deg, #fff, #aab5e0);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
+/* Content Area */
 .content {
-    background: transparent;
+    background: rgba(255, 255, 255, 0.97);
     border-radius: 12px;
-    flex-grow: 1;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
 }
 
+/* Grades Header */
 .grades-header {
     margin-bottom: 30px;
-    padding: 25px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    position: relative;
-    overflow: hidden;
+    text-align: center;
 }
 
+.grades-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* Cards Container */
 .cards-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
+    gap: 20px;
+    margin-top: 15px;
     margin-bottom: 25px;
-    margin-top: 10px;
 }
 
+/* Card Styles */
 .card {
-    background: rgba(255, 255, 255, 0.95);
+    background: #fff;
     border-radius: 12px;
     padding: 20px;
-    border: none;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    cursor: pointer;
-    transform: translateY(0);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-.card h2 {
-    font-size: 19px;
-    margin-bottom: 8px;
+/* Card Header */
+.card-header {
+    margin-bottom: 10px;
+}
+
+.subject-title {
+    font-size: 20px;
     color: #2a324b;
     font-weight: 600;
 }
 
-.card p {
-    color: #666;
-    margin-bottom: 12px;
-    font-size: 15px;
-    line-height: 1.5;
+.subject-teacher {
+    font-size: 14px;
+    color: #555;
+    margin-top: 5px;
 }
 
+/* Grade Display */
 .grade {
     font-weight: 600;
-    font-size: 17px;
-    display: inline-block;
-    padding: 4px 12px;
+    font-size: 16px;
+    padding: 6px 14px;
     border-radius: 20px;
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.04);
+    display: inline-block;
+    margin-top: 10px;
+    transition: background 0.3s;
 }
 
 .grade-a {
@@ -113,111 +115,87 @@ body {
 }
 
 .grade-b {
-    color: #2962ff;
+    color: #ffc107;
 }
 
 .grade-c {
-    color: #ff6d00;
+    color: #f44336;
 }
 
+/* Semester Summary */
 .semester-summary {
     background: rgba(255, 255, 255, 0.95);
     border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    padding: 20px;
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
     align-items: center;
-    margin-top: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.summary-block {
+    text-align: center;
+}
+
+.summary-title {
+    font-size: 18px;
+    font-weight: 600;
     margin-bottom: 10px;
+}
+
+/* GPA Circle */
+.gpa-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .gpa-circle {
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #3b4465 0%, #2a324b 100%);
-    border: none;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-right: 25px;
+    color: white;
     box-shadow: 0 4px 15px rgba(59, 68, 101, 0.2);
-    margin-top: 15px;
 }
 
 .gpa-value {
     font-size: 26px;
     font-weight: 700;
-    color: white;
 }
 
 .gpa-label {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.9);
-    letter-spacing: 0.5px;
+    font-size: 14px;
+    opacity: 0.9;
 }
 
+/* Academic Standing */
 .academic-standing {
-    text-align: right;
+    text-align: center;
     padding: 15px 25px;
-    background: rgba(76, 175, 80, 0.1);
     border-radius: 8px;
-    margin-top: 15px;
 }
 
 .standing-label {
     font-size: 15px;
-    color: #3b4465;
-    margin-bottom: 8px;
     font-weight: 500;
+    margin-bottom: 8px;
 }
 
 .standing-value {
     font-size: 20px;
     font-weight: 700;
-    color: #4CAF50;
-    letter-spacing: 0.5px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .cards-container {
-        grid-template-columns: 1fr;
-    }
-
-    .semester-summary {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .gpa-container {
-        margin-bottom: 20px;
-    }
-
-    .academic-standing {
-        text-align: left;
-        width: 100%;
-    }
-}
-
-/* Smooth Scroll */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        transition: none;
-    }
-}
-
-/* Hover Effects */
-.card:hover .grade {
-    transform: scale(1.05);
-}
-
-/* Teacher-specific CSS additions */
+/* Teacher Specific Styles */
 .teacher-subject {
     border: 2px solid #3b4465;
-    background: linear-gradient(45deg, rgba(255, 255, 255, 0.98), #f8f9ff);
+    background: linear-gradient(45deg, #fff, #f8f9ff);
     position: relative;
 }
 
@@ -231,87 +209,49 @@ body {
     margin-left: 10px;
 }
 
+/* Subject Header in Teacher Card */
 .subject-header {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     margin-bottom: 8px;
 }
 
-.status-indicators {
+/* Spinner Styles */
+.spinner-container {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    margin-top: 15px;
-}
-
-.status {
-    font-size: 14px;
-    font-weight: 500;
-    padding: 6px 12px;
-    border-radius: 18px;
-}
-
-.status-open {
-    background: #e8f5e9;
-    color: #00c853;
-}
-
-.status-in-progress {
-    background: #e3f2fd;
-    color: #2962ff;
-}
-
-.status-completed {
-    background: #f5f5f5;
-    color: #757575;
-}
-
-.status-upcoming {
-    background: #fff3e0;
-    color: #ff6d00;
-}
-
-.students-count {
-    font-size: 14px;
-    color: #666;
-    display: flex;
-    align-items: center;
-}
-
-.students-count::before {
-    content: "👤";
-    margin-right: 6px;
-}
-
-.summary-stats {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-}
-
-.stat-item {
-    text-align: center;
-}
-
-.stat-value {
-    font-size: 32px;
-    font-weight: 700;
-    color: #3b4465;
-    margin-bottom: 5px;
-}
-
-.stat-label {
-    color: #666;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Adjust existing CSS for teacher view */
-.grades-header h1::after {
-    background: linear-gradient(90deg, #3b4465 0%, #8792b0 100%);
-}
-
-.semester-summary {
     justify-content: center;
+    margin-top: 50px;
+    color: #555;
+    font-size: 16px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-top: 4px solid #3b4465;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .cards-container {
+        grid-template-columns: 1fr;
+    }
+
+    .semester-summary {
+        flex-direction: column;
+        align-items: center;
+    }
 }

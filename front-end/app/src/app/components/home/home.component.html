@@ -1,152 +1,82 @@
-<!-- student-catalogue.component.html -->
-<div *ngIf="!isTeacher">
-
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>GradeR</title>
-    </head>
-
-    <body>
-        <div class="header">
+<body>
+    <!-- STUDENT VIEW -->
+    <div *ngIf="!isTeacher" class="student-view">
+        <header class="header">
             <div class="logo">GradeR</div>
-        </div>
+        </header>
 
-        <div class="content">
+        <main class="content">
             <div class="grades-header">
                 <h1>My Grades</h1>
             </div>
 
-            <div class="cards-container">
-                <div class="card">
-                    <h2>Computer Science 101</h2>
-                    <p>Prof. Johnson</p>
-                    <div class="grade grade-a">Grade: 9.2</div>
-                </div>
-
-                <div class="card">
-                    <h2>Calculus II</h2>
-                    <p>Prof. Martinez</p>
-                    <div class="grade grade-b">Grade: 8.7</div>
-                </div>
-
-                <div class="card">
-                    <h2>Introduction to Psychology</h2>
-                    <p>Prof. Williams</p>
-                    <div class="grade grade-a">Grade: 9.0</div>
-                </div>
-
-                <div class="card">
-                    <h2>World History</h2>
-                    <p>Prof. Brown</p>
-                    <div class="grade grade-c">Grade: 7.8</div>
-                </div>
-
-                <div class="card">
-                    <h2>Racism</h2>
-                    <p>Prof. White</p>
-                    <div class="grade grade-a">Grade: 10+</div>
-                </div>
+            <div *ngIf="isLoading" class="spinner-container">
+                <div class="spinner"></div>
+                <p>Loading subjects...</p>
             </div>
 
-            <div class="semester-summary">
-                <div>
+            <section class="cards-container" *ngIf="!isLoading">
+                <div class="card" *ngFor="let subject of studentSubjectsWithGrades">
+                    <div class="card-header">
+                        <h2 class="subject-title">{{ subject.name }}</h2>
+                        <p class="subject-teacher">Prof. {{ subject.teacher }}</p>
+                    </div>
+                    <div class="grade" [ngClass]="{
+                    'grade-a': subject.average >= 9,
+                    'grade-b': subject.average >= 7 && subject.average < 9,
+                    'grade-c': subject.average < 7
+                  }">
+                        Avg Grade: {{ subject.average }}
+                    </div>
+                </div>
+            </section>
+
+            <section class="semester-summary" *ngIf="!isLoading">
+                <div class="summary-block">
                     <div class="summary-title">Semester Summary</div>
                     <div class="gpa-container">
-                        <div class="gpa-circle">
-                            <div class="gpa-value">10</div>
+                        <div class="gpa-circle" [ngStyle]="{ background: standing.color }">
+                            <div class="gpa-value">{{ averageScore }}</div>
                             <div class="gpa-label">Score</div>
                         </div>
                     </div>
                 </div>
-
-                <div class="academic-standing">
+                <div class="academic-standing" [ngStyle]="{ background: standing.color + '20' }">
                     <div class="standing-label">Academic Standing:</div>
-                    <div class="standing-value">Good Standing</div>
+                    <div class="standing-value" [ngStyle]="{ color: standing.color }">
+                        {{ standing.text }}
+                    </div>
                 </div>
-            </div>
-        </div>
-    </body>
-</div>
-<div *ngIf="isTeacher">
-    <!-- teacher-catalogue.component.html -->
+            </section>
+        </main>
+    </div>
 
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>GradeR - Teacher Portal</title>
-    </head>
-
-    <body>
-        <div class="header">
+    <!-- TEACHER VIEW -->
+    <div *ngIf="isTeacher" class="teacher-view">
+        <header class="header">
             <div class="logo">GradeR</div>
-        </div>
+        </header>
 
-        <div class="content">
+        <main class="content">
             <div class="grades-header">
                 <h1>My Subjects</h1>
                 <p>Manage your courses and track student progress</p>
             </div>
 
-            <div class="cards-container">
-                <!-- Highlighted Teacher's Own Subject -->
-                <div class="card teacher-subject">
-                    <div class="subject-header">
-                        <h2>Advanced Calculus</h2>
-                        <div class="teacher-badge">Your Class</div>
-                    </div>
-                    <p>Mathematics Department</p>
-                    <div class="status-indicators">
-                        <div class="status status-open">Enrollment Open</div>
-                        <div class="students-count">42 Students</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>Introduction to Psychology</h2>
-                    <p>Social Sciences Department</p>
-                    <div class="status-indicators">
-                        <div class="status status-in-progress">In Session</div>
-                        <div class="students-count">58 Students</div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>Computer Science 101</h2>
-                    <p>Computer Science Department</p>
-                    <div class="status-indicators">
-                        <div class="status status-completed">Course Ended</div>
-                        <div class="students-count">35 Students</div>
-                    </div>
-                </div>
-
-                <div class="card teacher-subject">
-                    <div class="subject-header">
-                        <h2>Modern Physics</h2>
-                        <div class="teacher-badge">Your Class</div>
-                    </div>
-                    <p>Physics Department</p>
-                    <div class="status-indicators">
-                        <div class="status status-upcoming">Starting Soon</div>
-                        <div class="students-count">27 Enrolled</div>
-                    </div>
-                </div>
+            <div *ngIf="isLoading" class="spinner-container">
+                <div class="spinner"></div>
+                <p>Loading subjects...</p>
             </div>
 
-            <div class="semester-summary">
-                <div class="summary-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">164</div>
-                        <div class="stat-label">Total Students</div>
+            <section class="cards-container" *ngIf="!isLoading">
+                <div class="card teacher-subject" *ngFor="let subject of teacherSubjects">
+                    <div class="subject-header">
+                        <h2 class="subject-title">{{ subject.name }}</h2>
+                        <div *ngIf="subject.ownsSubject" class="teacher-badge">Your Class</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value">4.8</div>
-                        <div class="stat-label">Avg. Rating</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">92%</div>
-                        <div class="stat-label">Completion Rate</div>
-                    </div>
+                    <p class="subject-teacher">Prof. {{ subject.teacher }}</p>
                 </div>
-            </div>
-        </div>
-    </body>
-</div>
+            </section>
+        </main>
+    </div>
+</body>
