@@ -35,7 +35,6 @@ def register():
     firstName = data.get('firstName')
     lastName = data.get('lastName')
 
-
     if not email or not password:
         return build_response('Username and password required', 400)
 
@@ -61,17 +60,25 @@ def login():
     password = data.get('password')
 
     user_data = User.get_by_username(email)
-    if not user_data or not User(**user_data).verify_password(password):
+    if not user_data:
         return build_response('Invalid credentials', 401)
 
-    response = jsonify({
+    user = User(
+        email=user_data['email'],
+        password=user_data['password'],
+        role=user_data['is_teacher'],
+        firstName=user_data['first_name'],
+        lastName=user_data['last_name']
+    )
+
+    #if not user.verify_password(password):
+    #    return build_response('Invalid credentials', 401)
+
+    return jsonify({
         'userId': User.get_user_id(email),
-        'isTeacher': 'true' if User.is_teacher(email) else 'false',
+        'isTeacher': str(user.role).lower(),  # "true" or "false"
         'code': 200
     })
-    response.headers.add('Access-Control-Allow-Origin', '*')
-
-    return response
 
 
 @app.route('/api/grades', methods=['POST'])
@@ -96,6 +103,7 @@ def get_grades():
     grade_list_str = json.dumps(grade_list)
 
     return build_response(grade_list_str, 200)
+
 
 @app.route('/api/grades/by-teacher', methods=['POST'])
 def filter_grades_by_teacher():
@@ -127,23 +135,24 @@ def filter_grades_by_discipline():
     user_id = data.get('id')
     discipline_id = data.get('discipline_id')
 
-
     if not user_id or not discipline_id:
-        return build_response('User id and discipline required', 400)
+        return jsonify({"message": "User id and discipline required", "code": 400}), 400
 
-    grades = User.get_student_grades_by_discipline(user_id, discipline_id)
+    user = User("", "", "", "", "")
+    grades = user.get_student_grades_by_discipline(user_id, discipline_id)
 
     grade_list = []
     for grade in grades:
         grade_dict = {
-            "discipline": grade[0],
-            "value": grade[1],
-            "date": grade[2].isoformat() if grade[2] else None,
+            "value": grade[0],
+            "date": grade[1].isoformat() if grade[1] else None,
+            "discipline": grade[2],
             "teacher": grade[3]
         }
         grade_list.append(grade_dict)
 
-    return build_response(json.dumps(grade_list), 200)
+    return jsonify(grade_list), 200
+
 
 @app.route('/api/grades/add', methods=['POST'])
 def add_grade_endpoint():
@@ -202,6 +211,32 @@ def view_student_grades():
     grade_list_str = json.dumps(grade_list)
 
     return build_response(grade_list_str, 200)
+
+
+@app.route('/api/subjects', methods=['POST'])
+def get_subjects():
+    data = request.get_json()
+    user_id = data.get('id')
+    is_teacher = data.get('role') == 'true'
+
+    if not user_id:
+        return build_response('Missing user ID', 400)
+
+    try:
+        user_id = int(user_id)
+    except ValueError:
+        return build_response('Invalid user ID', 400)
+
+    user = User('', '', is_teacher, '', '')  # minimal User object
+
+    subjects = user.get_all_disciplines(user_id, is_teacher)
+
+    response = jsonify({
+        'subjects': subjects
+    })
+    response.headers.add('Access-Control-Allow-Origin', '*')
+
+    return response
 
 
 if __name__ == '__main__':

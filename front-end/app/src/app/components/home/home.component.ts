@@ -2,6 +2,15 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ApiService } from '../../services/api.service';
+import { SubjectModel } from '../../models/SubjectModel';
+import { catchError, forkJoin, map, of } from 'rxjs';
+import { GradeModel } from '../../models/GradeModel';
+
+interface SubjectWithGrades extends SubjectModel {
+  grades: number[];
+  average: number;
+}
 
 @Component({
   selector: 'app-home',
@@ -13,160 +22,100 @@ import { ActivatedRoute, Router } from '@angular/router';
   styleUrl: './home.component.css'
 })
 export class HomeComponent implements OnInit {
-  searchQuery: string = '';
-  currentYear: number = new Date().getFullYear();
   isTeacher: boolean = true;
-  
-  categories = [
-    {
-      id: 1,
-      name: 'Arts & Humanities',
-      description: 'Literature, Philosophy, History, and more',
-      icon: '🎭'
-    },
-    {
-      id: 2,
-      name: 'Science & Mathematics',
-      description: 'Physics, Chemistry, Biology, Mathematics',
-      icon: '🔬'
-    },
-    {
-      id: 3,
-      name: 'Social Sciences',
-      description: 'Psychology, Sociology, Economics, and more',
-      icon: '🌐'
-    },
-    {
-      id: 4,
-      name: 'Engineering & Technology',
-      description: 'Computer Science, Civil, Electrical Engineering',
-      icon: '💻'
-    },
-    {
-      id: 5,
-      name: 'Business & Management',
-      description: 'Finance, Marketing, Accounting, and more',
-      icon: '📊'
-    },
-    {
-      id: 6,
-      name: 'Health & Medicine',
-      description: 'Nursing, Public Health, Medicine',
-      icon: '🏥'
-    }
-  ];
-  
-  featuredCourses = [
-    {
-      id: 101,
-      title: 'Introduction to Computer Science',
-      code: 'CS 101',
-      credits: 4,
-      description: 'An introductory course covering fundamentals of programming and computational thinking.',
-      imageText: 'Computer Science'
-    },
-    {
-      id: 102,
-      title: 'Principles of Economics',
-      code: 'ECON 201',
-      credits: 3,
-      description: 'Study of economic principles, theories, and methods used in modern economics.',
-      imageText: 'Economics'
-    },
-    {
-      id: 103,
-      title: 'General Biology',
-      code: 'BIO 110',
-      credits: 4,
-      description: 'Introduction to biological concepts including cellular structure, genetics, and evolution.',
-      imageText: 'Biology'
-    },
-    {
-      id: 104,
-      title: 'Art History: Renaissance to Modern',
-      code: 'ART 205',
-      credits: 3,
-      description: 'Survey of major artistic movements from the Renaissance period to the modern era.',
-      imageText: 'Art History'
-    },
-    {
-      id: 105,
-      title: 'Calculus I',
-      code: 'MATH 141',
-      credits: 4,
-      description: 'Study of functions, limits, derivatives, and integrals with applications.',
-      imageText: 'Mathematics'
-    }
-  ];
-  
-  quickLinks = [
-    {
-      id: 1,
-      title: 'Academic Calendar',
-      description: 'Important dates and deadlines',
-      icon: '📅',
-      url: '/calendar'
-    },
-    {
-      id: 2,
-      title: 'Registration',
-      description: 'Register for courses',
-      icon: '📝',
-      url: '/registration'
-    },
-    {
-      id: 3,
-      title: 'Student Resources',
-      description: 'Tools for academic success',
-      icon: '🧰',
-      url: '/resources'
-    },
-    {
-      id: 4,
-      title: 'Financial Aid',
-      description: 'Scholarships and aid information',
-      icon: '💰',
-      url: '/financial-aid'
-    }
-  ];
-  
+
+  allSubjects: SubjectModel[] = [];
+  averageScore: number = 0;
+  isLoading: boolean = true;
+  subjectAverages: { [id: number]: number } = {};
+  studentSubjectsWithGrades: SubjectWithGrades[] = []
+
   constructor(
     private router: Router,
-    private route: ActivatedRoute
-  ) { }
-  
+    private route: ActivatedRoute,
+    private api: ApiService
+  ) {}
+
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-      const role = params['role'] === 'true';
-      console.log('Role:', role);
+      this.isTeacher = params['role'] === 'true';
+      this.fetchSubjects();
+    });
+  }
 
-      this.isTeacher = role;
+  fetchSubjects(): void {
+    this.isLoading = true;
+    this.api.getSubjects(this.isTeacher).subscribe({
+      next: (data: any) => {
+        this.allSubjects = data.subjects.map((s: any) => ({
+          name: s.name,
+          teacher: s.teacher,
+          ownsSubject: s.owns_discipline,
+          idDiscipline: s.id_discipline
+        }));
+        this.isLoading = false;
+  
+        if (!this.isTeacher) this.loadAverageScore();
+      },
+      error: err => {
+        console.error('Failed to fetch subjects:', err);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  get studentSubjects(): SubjectModel[] {
+    return (this.allSubjects || []).filter(subj => !subj.ownsSubject);
+  }
+  
+  get teacherSubjects(): SubjectModel[] {
+    console.log(this.allSubjects)
+    return this.allSubjects;
+  }  
+  
+  loadAverageScore(): void {
+    const gradeRequests = this.studentSubjects.map(subj =>
+      this.api.getGradesBySubject(subj.idDiscipline).pipe(
+        catchError(() => of([] as GradeModel[])),
+        map((grades: GradeModel[]) => {
+          // Log grade values and their types for debugging
+          grades.forEach(g => {
+            console.log(`Grade for subject ${subj.name}: value = ${g.value}, type = ${typeof g.value}`);
+          });
+          // Convert all grade values to numbers (in case they're strings)
+          const gradeValues = grades.map(g => {
+            let value = g.value;
+            if (typeof value === 'string') {
+              value = parseFloat(value);
+            }
+            return value;
+          });
+          return { subject: subj, grades: gradeValues };
+        })
+      )
+    );
+  
+    forkJoin(gradeRequests).subscribe(subjectResults => {
+      const subjectsWithAverages: SubjectWithGrades[] = subjectResults.map(({ subject, grades }) => {
+        // Compute per-subject average
+        const average = grades.length ? +(grades.reduce((a, b) => a + b, 0) / grades.length).toFixed(2) : 0;
+        return { ...subject, grades, average };
+      });
+  
+      // Save the computed per-subject averages into the component's property
+      this.studentSubjectsWithGrades = subjectsWithAverages;
+  
+      // For overall semester average, average all grade numbers across subjects
+      const allGrades = subjectsWithAverages.flatMap(subj => subj.grades);
+      const totalAvg = allGrades.length ? +(allGrades.reduce((a, b) => a + b, 0) / allGrades.length).toFixed(2) : 0;
+      this.averageScore = totalAvg;
     });
   }
   
-  performSearch(): void {
-    if (this.searchQuery.trim()) {
-      console.log('Searching for:', this.searchQuery);
-      // In a real application, navigate to search results
-      // this.router.navigate(['/search'], { queryParams: { q: this.searchQuery } });
-    }
-  }
-  
-  navigateToCategory(category: any): void {
-    console.log('Navigating to category:', category.name);
-    // In a real application, navigate to category page
-    // this.router.navigate(['/category', category.id]);
-  }
-  
-  enrollCourse(course: any): void {
-    console.log('Viewing course details:', course.title);
-    // In a real application, navigate to course details page
-    // this.router.navigate(['/course', course.id]);
-  }
-  
-  navigateToLink(link: any): void {
-    console.log('Navigating to link:', link.title);
-    // In a real application, navigate to the page
-    // this.router.navigate([link.url]);
+  get standing(): { text: string; color: string } {
+    const avg = this.averageScore;
+    if (avg >= 9) return { text: 'Very Good', color: '#00c853' };
+    if (avg >= 7) return { text: 'Good', color: '#ffc107' };
+    return { text: 'Bad', color: '#f44336' };
   }
 }

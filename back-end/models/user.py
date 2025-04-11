@@ -27,46 +27,63 @@ class User:
 
     @staticmethod
     def save(user):
-        users = User.get_all()
-        users[user.id] = user.__dict__
-        User._save_to_db(users)
+        user_data = {
+            'first_name': user.firstName,
+            'last_name': user.lastName,
+            'email': user.email,
+            'password': user.password,  # already hashed
+            'is_teacher': user.role
+        }
+        user.id = User._save_to_db(user_data)
 
     @staticmethod
     def get_by_username(email):
-        users = User.get_all()
-        for user in users.values():
-            if user['email'] == email:
-                return user
-        return None
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+            row = cursor.fetchone()
+            if row:
+                columns = [desc[0] for desc in cursor.description]
+                return dict(zip(columns, row))
+            return None
+        finally:
+            cursor.close()
 
     @staticmethod
     def get_all():
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM user")
+        cursor.execute("SELECT * FROM users")
 
-        data = cursor.fetchall()
-
+        rows = cursor.fetchall()
+        columns = [desc[0] for desc in cursor.description]
         cursor.close()
-        if data:
-            return data.__dict__
+
+        if rows:
+            return {
+                row[0]: dict(zip(columns, row))  # Use row[0] (user_id) as the key
+                for row in rows
+            }
+
+        return {}
 
     @staticmethod
-    def _save_to_db(users):
+    def _save_to_db(user_data):
         cursor = conn.cursor()
-
         try:
-            columns = ', '.join(users.keys())
-            values = ', '.join(['%s'] * len(users))
-            sql = f"INSERT INTO user ({columns}) VALUES ({values})"
+            columns = ', '.join(user_data.keys())
+            placeholders = ', '.join(['%s'] * len(user_data))
+            sql = 'INSERT INTO users ({}) VALUES ({}) RETURNING id_user;'.format(columns, placeholders)
 
-            cursor.execute(sql, tuple(users.values()))
-
+            cursor.execute(sql, tuple(user_data.values()))
+            new_id = cursor.fetchone()[0]
             conn.commit()
+            print("User inserted successfully with ID:", new_id)
+            return new_id
         except psycopg2.Error as e:
+            conn.rollback()
             print(f"Encountered an error: {e}")
         finally:
             cursor.close()
-            conn.close()
 
     @staticmethod
     def get_student_grades(student_id):
@@ -91,7 +108,7 @@ class User:
     def get_user_id(email):
         cursor = conn.cursor()
 
-        cursor.execute("SELECT id_user FROM user WHERE email = %s", (email))
+        cursor.execute("SELECT id_user FROM users WHERE email = %s", (email,))
 
         result = cursor.fetchone()
 
@@ -99,10 +116,10 @@ class User:
 
         return result[0]
 
-    def get_last_name(user_id):
+    def get_last_name(self, user_id):
         cursor = conn.cursor()
-        
-        cursor.execute("SELECT last_name FROM user WHERE id_user = %s", (user_id))
+
+        cursor.execute("SELECT last_name FROM users WHERE id_user = %s", (user_id,))
 
         result = cursor.fetchone()
 
@@ -110,23 +127,23 @@ class User:
 
         return result[0]
 
+    @staticmethod
     def is_teacher(email):
         cursor = conn.cursor()
 
-        cursor.execute("SELECT is_teacher FROM user WHERE email = %s;", (email))
+        cursor.execute("SELECT is_teacher FROM users WHERE email = %s;", (email,))
 
         result = cursor.fetchone()
 
         cursor.close()
 
         if result is not None:
-            return result[0] 
+            return result[0]
         else:
-            return None 
+            return None
 
+    def get_student_grades_by_teacher(self, student_id, teacher_id):
 
-    def get_student_grades_by_teacher(student_id, teacher_id):
-        
         cursor = conn.cursor()
         query = """
             SELECT 
@@ -137,35 +154,36 @@ class User:
             FROM 
                 grade g
             JOIN 
-                user u ON g.id_student = u.id_user
+                users u ON g.id_student = u.id_user
             JOIN 
                 discipline d ON g.id_discipline = d.id_discipline
             JOIN 
-                user t ON d.id_teacher = t.id_user
+                users t ON d.id_teacher = t.id_user
             WHERE 
                 g.id_student = %s 
                 AND t.is_teacher = true 
                 AND t.id_user = %s;
         """
 
-        cursor.execute(query, (student_id,teacher_id))
-        
+        cursor.execute(query, (student_id, teacher_id))
+
         grades = cursor.fetchall()
 
         return grades
-    
+
+    @staticmethod
     def get_student_grades_by_discipline(student_id, discipline_id):
 
         cursor = conn.cursor()
         query = """
             SELECT 
-                g.value,
-                g.date,
-                d.name,
-                t.first_name || ' ' || t.last_name AS teacher_name
+                g.value AS value,
+                g.date AS date,
+                d.name AS discipline,
+                t.first_name || ' ' || t.last_name AS teacher
             FROM grade g
             JOIN discipline d ON g.id_discipline = d.id_discipline
-            JOIN user t ON d.id_teacher = t.id_user
+            JOIN users t ON d.id_teacher = t.id_user
             WHERE 
                 g.id_student = %s AND 
                 t.is_teacher = TRUE AND
@@ -223,11 +241,12 @@ class User:
             owns_discipline = False
             if is_teacher:
                 owns_discipline = row[1] == user_id
+
             discipline_list.append({
                 "id_discipline": row[0],
-                "name": row[2],  
+                "name": row[2],
                 "teacher": self.get_last_name(row[1]),
-                "owns_discipline": owns_discipline 
+                "owns_discipline": owns_discipline
             })
 
         cursor.close()
@@ -257,7 +276,7 @@ class User:
     @staticmethod
     def get_by_id(user_id):
         cursor = conn.cursor()
-        cursor.execute('SELECT id_user, email, password, is_teacher FROM "user" WHERE id_user = %s', (user_id,))
+        cursor.execute('SELECT id_user, email, password, is_teacher FROM users WHERE id_user = %s', (user_id,))
         data = cursor.fetchone()
         cursor.close()
         if data:
