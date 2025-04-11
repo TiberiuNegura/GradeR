@@ -16,7 +16,7 @@
             </div>
 
             <section class="cards-container" *ngIf="!isLoading">
-                <div class="card" *ngFor="let subject of studentSubjectsWithGrades">
+                <div class="card" *ngFor="let subject of studentSubjectsWithGrades" (click)="goToSubject(subject)"                >
                     <div class="card-header">
                         <h2 class="subject-title">{{ subject.name }}</h2>
                         <p class="subject-teacher">Prof. {{ subject.teacher }}</p>
@@ -69,7 +69,7 @@
             </div>
 
             <section class="cards-container" *ngIf="!isLoading">
-                <div class="card teacher-subject" *ngFor="let subject of teacherSubjects">
+                <div class="card teacher-subject" *ngFor="let subject of teacherSubjects" (click)="goToSubject(subject)">
                     <div class="subject-header">
                         <h2 class="subject-title">{{ subject.name }}</h2>
                         <div *ngIf="subject.ownsSubject" class="teacher-badge">Your Class</div>

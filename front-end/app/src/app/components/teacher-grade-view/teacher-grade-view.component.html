@@ -1,0 +1,40 @@
+<body>
+    <div class="teacher-subject-view">
+        <div class="subject-header">
+            <div class="subject-title">
+                <h1>{{ subjectName }}</h1>
+                <p class="teacher-name">You are teaching this subject</p>
+            </div>
+            <input type="text" [(ngModel)]="search" (input)="filterGrades()" placeholder="Search by student name..."
+                class="search-bar" />
+        </div>
+
+        <div class="grades-container">
+            <div class="grade-entry" *ngFor="let grade of filteredGrades">
+                <div class="student-info">
+                    <span class="grade-date">{{ grade.date | date: 'mediumDate' }}</span>
+                </div>
+
+
+                <div class="grade-controls" *ngIf="editingGradeId !== grade.id">
+                    <span class="grade-display">{{ grade.value }}</span>
+                    <button class="update-btn" (click)="startEdit(grade)">Edit</button>
+                    <button class="delete-btn" (click)="deleteGrade(grade.id)">Delete</button>
+                </div>
+
+                <div class="grade-controls" *ngIf="editingGradeId === grade.id">
+                    <input type="number" [(ngModel)]="updatedValue" min="1" max="10" class="grade-input" />
+                    <button class="save-btn" (click)="updateGrade(grade.id)">Save</button>
+                    <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
+                </div>
+            </div>
+
+            <div class="new-grade">
+                <input type="text" [(ngModel)]="newGrade.studentId" placeholder="Student ID" class="student-id-input" />
+                <input type="number" [(ngModel)]="newGrade.value" min="1" max="10" placeholder="Grade"
+                    class="grade-input" />
+                <button class="add-btn" (click)="addGrade()">Add Grade</button>
+            </div>
+        </div>
+    </div>
+</body>

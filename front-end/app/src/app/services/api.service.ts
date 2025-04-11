@@ -40,4 +40,32 @@ export class ApiService {
 
     return this.httpClient.post<GradeModel[]>(`${this.server}grades/by-discipline`, params);
   }
+
+  public getAllGradesForDiscipline(subjectId: number) {
+    return this.httpClient.post(`${this.server}grades/by-discipline`, subjectId);
+  }
+
+  public addGrade(studentId: number, grade: number, subjectId: number) {
+    const params = {
+      id: studentId,
+      discipline_id: subjectId,
+      subjectValue: grade
+    };
+
+    return this.httpClient.post(`${this.server}grades/add`, params);
+  }
+  
+  public updateGrade(gradeId: number, newGrade: number) {
+    const params = {
+      id: localStorage.getItem('id'),
+      gradeValue: newGrade,
+      gradeId: gradeId
+    };
+
+    return this.httpClient.post(`${this.server}grades/update`, params);
+  }
+
+  public deleteGrade(gradeId: number) {
+    return this.httpClient.delete(`${this.server}grade/delete`);
+  }
 }

@@ -1,0 +1,134 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', -apple-system, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
+}
+
+/* Body and Wrapper */
+body {
+    background: linear-gradient(135deg, #3b4465 0%, #2a324b 100%);
+    padding: 20px;
+    min-height: 100vh;
+    color: #333;
+}
+
+.teacher-subject-view {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    max-width: 960px;
+    margin: 40px auto;
+}
+
+.subject-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.subject-header h1 {
+    color: #2a324b;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.teacher-name {
+    font-size: 15px;
+    color: #666;
+}
+
+.search-bar {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    background: #f5f5f5;
+    width: 260px;
+}
+
+.grades-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.grade-entry,
+.new-grade {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f0f3fa;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.student-info {
+    display: flex;
+    flex-direction: column;
+    color: #2a324b;
+    font-size: 15px;
+}
+
+.grade-date {
+    font-size: 13px;
+    color: #888;
+}
+
+.grade-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.grade-input,
+.student-id-input {
+    width: 80px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.add-btn,
+.update-btn,
+.delete-btn {
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.add-btn {
+    background-color: #3b4465;
+    color: white;
+}
+
+.update-btn {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.add-btn:hover {
+    background-color: #2a324b;
+}
+
+.update-btn:hover {
+    background-color: #e0a800;
+}
+
+.delete-btn:hover {
+    background-color: #d32f2f;
+}

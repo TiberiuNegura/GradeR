@@ -308,5 +308,38 @@ class User:
             return False, "Teacher is not assigned to this discipline"
         return True, None
 
+    @staticmethod
+    def get_full_name_by_id(user_id):
+        cursor = conn.cursor()
+        cursor.execute("SELECT first_name, last_name FROM users WHERE id_user = %s", (user_id,))
+        result = cursor.fetchone()
+        cursor.close()
+        if result:
+            return f"{result[0]} {result[1]}"
+        return None
+
+    @staticmethod
+    def get_user_id_by_full_name(first_name, last_name):
+        cursor = conn.cursor()
+        cursor.execute("SELECT id_user FROM users WHERE first_name = %s AND last_name = %s", (first_name, last_name))
+        result = cursor.fetchone()
+        cursor.close()
+        return result[0] if result else None
+
+    @staticmethod
+    def update_grade(grade_id, new_value):
+        cursor = conn.cursor()
+        cursor.execute("UPDATE grade SET value = %s WHERE id_grade = %s", (new_value, grade_id))
+        conn.commit()
+        cursor.close()
+
+    @staticmethod
+    def delete_grade(grade_id):
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM grade WHERE id_grade = %s", (grade_id,))
+        conn.commit()
+        cursor.close()
+
+
     def verify_password(self, password):
         return check_password_hash(self.password, password)
