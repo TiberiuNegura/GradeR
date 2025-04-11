@@ -1,0 +1,59 @@
+.grade-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: 0.3s;
+    margin-bottom: 15px;
+}
+
+.grade-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.grade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.grade-header h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2a324b;
+}
+
+.grade-date {
+    font-size: 14px;
+    color: #888;
+}
+
+.grade-value {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 15px 0;
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.grade-a {
+    color: #00c853;
+}
+
+.grade-b {
+    color: #ffc107;
+}
+
+.grade-c {
+    color: #f44336;
+}
+
+.grade-meta {
+    font-size: 14px;
+    color: #555;
+    margin-top: 5px;
+}

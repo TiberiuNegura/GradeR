@@ -1,0 +1,22 @@
+<body>
+    <div class="student-subject-view">
+        <div class="subject-header">
+            <div class="subject-title">
+                <h1>{{ subjectName }}</h1>
+                <span class="teacher-name">Taught by Prof. {{ teacher }}</span>
+            </div>
+        </div>
+
+        <div class="grades-container">
+            <ng-container *ngIf="grades.length > 0; else noGrades">
+                <app-grade-card *ngFor="let grade of grades" [value]="grade.value" [date]="grade.date"
+                    [teacher]="teacher" [subjectName]="subjectName">
+                </app-grade-card>
+            </ng-container>
+
+            <ng-template #noGrades>
+                <p class="no-grades">No grades found for this subject.</p>
+            </ng-template>
+        </div>
+    </div>
+</body>

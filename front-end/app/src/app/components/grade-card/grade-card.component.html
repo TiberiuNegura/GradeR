@@ -1,0 +1,10 @@
+<!-- grade-card.component.html -->
+<div class="grade-card">
+    <div class="grade-header">
+        <span class="grade-date">{{ date | date:'mediumDate' }}</span>
+    </div>
+
+    <div class="grade-value" [ngClass]="gradeClass">
+        {{ value }}
+    </div>
+</div>
