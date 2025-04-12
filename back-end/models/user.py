@@ -86,6 +86,25 @@ class User:
             cursor.close()
 
     @staticmethod
+    def delete_grade_record(grade_id):
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM grade WHERE id_grade = %s RETURNING id_grade;", (grade_id,))
+        deleted = cursor.fetchone()
+        conn.commit()
+        cursor.close()
+        return deleted is not None
+
+    @staticmethod
+    def update_grade_record(grade_id, new_value, new_date):
+        cursor = conn.cursor()
+        sql = "UPDATE grade SET value = %s, date = %s WHERE id_grade = %s RETURNING id_grade;"
+        cursor.execute(sql, (new_value, new_date, grade_id))
+        updated = cursor.fetchone()
+        conn.commit()
+        cursor.close()
+        return updated is not None
+
+    @staticmethod
     def get_student_grades(student_id):
 
         cursor = conn.cursor()

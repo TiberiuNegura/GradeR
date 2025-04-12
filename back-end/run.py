@@ -189,6 +189,28 @@ def add_grade_endpoint():
 
     return build_response("Grade added successfully", 201)
 
+@app.route('/api/grades/<int:grade_id>', methods=['DELETE'])
+def delete_grade(grade_id):
+    success = User.delete_grade_record(grade_id)
+    if success:
+        return build_response(f"Grade {grade_id} deleted", 200)
+    else:
+        return build_response("Grade not found or could not be deleted", 404)
+
+@app.route('/api/grades/<int:grade_id>', methods=['PUT'])
+def update_grade(grade_id):
+    data = request.get_json()
+    new_value = data.get('value')
+    new_date = data.get('date')
+
+    if new_value is None or new_date is None:
+        return build_response("Value and date are required", 400)
+
+    success = User.update_grade_record(grade_id, new_value, new_date)
+    if success:
+        return build_response(f"Grade {grade_id} updated", 200)
+    else:
+        return build_response("Grade not found or could not be updated", 404)
 
 @app.route('/api/grades/teacher', methods=['POST'])
 def view_student_grades():
