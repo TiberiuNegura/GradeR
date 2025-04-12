@@ -249,21 +249,23 @@ class User:
     def get_student_grades_by_discipline(discipline_id, student_id):
         cursor = conn.cursor()
         query = """
-            SELECT 
-                g.id_grade,
-                g.value,
-                g.date,
-                t.first_name || ' ' || t.last_name AS teacher_name
-            FROM grade g
-            JOIN discipline d ON g.id_discipline = d.id_discipline
-            JOIN users t ON d.id_teacher = t.id_user
-            WHERE 
-                g.id_student = %s AND 
-                d.id_discipline = %s;
-        """
+                    SELECT
+                        g.id_grade,
+                        g.value,
+                        g.date,
+                        t.first_name || ' ' || t.last_name AS teacher_name
+                    FROM grade g
+                    JOIN discipline d ON g.id_discipline = d.id_discipline
+                    JOIN users t ON d.id_teacher = t.id_user
+                    WHERE 
+                        g.id_student = %s AND 
+                        t.is_teacher = TRUE AND
+                        d.id_discipline = %s;
+                """
+
         cursor.execute(query, (student_id, discipline_id))
+
         grades = cursor.fetchall()
-        cursor.close()
 
         grade_list = []
         for row in grades:
