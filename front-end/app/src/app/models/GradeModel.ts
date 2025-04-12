@@ -1,5 +1,6 @@
 export interface GradeModel {
+    id: number
     value: number,
-    id: number,
+    name: string,
     date: string
 }

@@ -215,31 +215,66 @@ class User:
         return grades
 
     @staticmethod
-    def get_student_grades_by_discipline(student_id, discipline_id):
-
+    def get_grades_by_discipline_and_teacher(discipline_id, teacher_id):
         cursor = conn.cursor()
         query = """
             SELECT 
-                g.value AS value,
-                g.date AS date,
-                d.name AS discipline,
-                t.first_name || ' ' || t.last_name AS teacher
+                g.id_grade,
+                g.value,
+                u.first_name || ' ' || u.last_name AS student_name,
+                g.date
+            FROM grade g
+            JOIN discipline d ON g.id_discipline = d.id_discipline
+            JOIN users u ON g.id_student = u.id_user
+            WHERE 
+                d.id_discipline = %s AND
+                d.id_teacher = %s;
+        """
+        cursor.execute(query, (discipline_id, teacher_id))
+        grades = cursor.fetchall()
+        cursor.close()
+
+        grade_list = []
+        for row in grades:
+            grade_list.append({
+                "id": row[0],
+                "value": row[1],
+                "name": row[2],
+                "date": row[3].isoformat() if row[3] else None
+            })
+
+        return grade_list
+
+    @staticmethod
+    def get_student_grades_by_discipline(discipline_id, student_id):
+        cursor = conn.cursor()
+        query = """
+            SELECT 
+                g.id_grade,
+                g.value,
+                g.date,
+                t.first_name || ' ' || t.last_name AS teacher_name
             FROM grade g
             JOIN discipline d ON g.id_discipline = d.id_discipline
             JOIN users t ON d.id_teacher = t.id_user
             WHERE 
                 g.id_student = %s AND 
-                t.is_teacher = TRUE AND
                 d.id_discipline = %s;
         """
-
         cursor.execute(query, (student_id, discipline_id))
-
         grades = cursor.fetchall()
-
         cursor.close()
 
-        return grades
+        grade_list = []
+        for row in grades:
+            grade_list.append({
+                "id": row[0],
+                "value": row[1],
+                "date": row[2].isoformat() if row[2] else None,
+                "name": row[3]
+            })
+
+        return grade_list
 
     def get_all_student_grades(self):
         cursor = conn.cursor()
@@ -340,14 +375,16 @@ class User:
         cursor.close()
         return new_grade_id
 
-    def is_assigned_to_discipline(self, discipline_id):
+    @staticmethod
+    def is_assigned_to_discipline(discipline_id, teacher_id):
         cursor = conn.cursor()
         cursor.execute("SELECT id_teacher FROM discipline WHERE id_discipline = %s", (discipline_id,))
         discipline_info = cursor.fetchone()
         cursor.close()
+
         if not discipline_info:
             return False, "Discipline not found"
-        if discipline_info[0] != self.id:
+        if discipline_info[0] != teacher_id:
             return False, "Teacher is not assigned to this discipline"
         return True, None
 
