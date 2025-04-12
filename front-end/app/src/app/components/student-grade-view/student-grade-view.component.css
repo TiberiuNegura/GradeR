@@ -42,4 +42,10 @@ body {
     gap: 15px;
 }
 
+.grades-container {
+    display: flex;
+    margin-top: 1.5em;
+    overflow-x: auto;
+}
+
 /* Add styles to grade-card if needed here */
