@@ -212,6 +212,28 @@ def update_grade(grade_id):
     else:
         return build_response("Grade not found or could not be updated", 404)
 
+@app.route('/api/grades/search', methods=['POST'])
+def search_grades_by_name():
+    data = request.get_json()
+    search_term = data.get('name')
+
+    if not search_term:
+        return build_response("Search term required", 400)
+
+    grades = User.get_grades_by_student_name(search_term)
+    grade_list = []
+    for grade in grades:
+        grade_dict = {
+            "id_grade": grade[0],
+            "value": grade[1],
+            "date": grade[2].isoformat() if grade[2] else None,
+            "discipline": grade[3],
+            "student": f"{grade[4]} {grade[5]}"  # full name
+        }
+        grade_list.append(grade_dict)
+
+    return build_response(json.dumps(grade_list), 200)
+
 @app.route('/api/grades/teacher', methods=['POST'])
 def view_student_grades():
     data = request.get_json()

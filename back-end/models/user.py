@@ -105,6 +105,30 @@ class User:
         return updated is not None
 
     @staticmethod
+    def get_grades_by_student_name(search_term):
+        cursor = conn.cursor()
+
+        # Normalize search term to lowercase
+        search_term = search_term.lower()
+
+        sql = """
+            SELECT g.id_grade, g.value, g.date, d.name AS discipline,
+                   u.first_name, u.last_name
+            FROM grade g
+            JOIN discipline d ON g.id_discipline = d.id_discipline
+            JOIN "user" u ON g.id_student = u.id_user
+            WHERE LOWER(u.first_name) LIKE %s
+               OR LOWER(u.last_name) LIKE %s
+               OR LOWER(CONCAT(u.first_name, ' ', u.last_name)) LIKE %s
+               OR LOWER(CONCAT(u.last_name, ' ', u.first_name)) LIKE %s;
+        """
+        like_term = f"%{search_term}%"
+        cursor.execute(sql, (like_term, like_term, like_term, like_term))
+        results = cursor.fetchall()
+        cursor.close()
+        return results
+
+    @staticmethod
     def get_student_grades(student_id):
 
         cursor = conn.cursor()
