@@ -129,29 +129,28 @@ def filter_grades_by_teacher():
     return build_response(json.dumps(grade_list), 200)
 
 
-@app.route('/api/grades/by-discipline', methods=['POST'])
-def filter_grades_by_discipline():
+@app.route('/api/grades/by-discipline-student', methods=['POST'])
+def filter_student_grades_by_discipline():
     data = request.get_json()
-    user_id = data.get('id')
+    student_id = data.get('id')
     discipline_id = data.get('discipline_id')
 
-    if not user_id or not discipline_id:
-        return jsonify({"message": "User id and discipline required", "code": 400}), 400
+    if not discipline_id and not student_id:
+        return jsonify({"message": "Discipline and student id required", "code": 400}), 400
 
-    user = User("", "", "", "", "")
-    grades = user.get_student_grades_by_discipline(user_id, discipline_id)
+    return build_response(json.dumps(User.get_student_grades_by_discipline(discipline_id, student_id)), 200)
 
-    grade_list = []
-    for grade in grades:
-        grade_dict = {
-            "value": grade[0],
-            "date": grade[1].isoformat() if grade[1] else None,
-            "discipline": grade[2],
-            "teacher": grade[3]
-        }
-        grade_list.append(grade_dict)
 
-    return jsonify(grade_list), 200
+@app.route('/api/grades/by-discipline-teacher', methods=['POST'])
+def filter_grades_by_discipline_and_teacher():
+    data = request.get_json()
+    teacher_id = data.get('id')
+    discipline_id = data.get('discipline_id')
+
+    if not discipline_id and not teacher_id:
+        return jsonify({"message": "Discipline and teacher id required", "code": 400}), 400
+
+    return build_response(json.dumps(User.get_grades_by_discipline_and_teacher(discipline_id, teacher_id)), 200)
 
 
 @app.route('/api/grades/add', methods=['POST'])
@@ -173,8 +172,7 @@ def add_grade_endpoint():
     if not teacher_data.get("is_teacher"):
         return build_response("User is not a teacher", 403)
 
-    teacher_instance = User(**teacher_data)
-    assigned, error_message = teacher_instance.is_assigned_to_discipline(discipline_id)
+    assigned, error_message = User.is_assigned_to_discipline(discipline_id, teacher_id)
 
     if not assigned:
         if error_message == "Discipline not found":

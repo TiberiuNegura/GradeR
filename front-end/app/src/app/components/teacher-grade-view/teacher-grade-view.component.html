@@ -10,9 +10,19 @@
         </div>
 
         <div class="grades-container">
+
+            <div class="new-grade">
+                <input type="text" [(ngModel)]="newGrade.studentId" placeholder="Student ID" class="student-id-input" />
+                <input type="number" [(ngModel)]="newGrade.value" min="1" max="10" placeholder="Grade"
+                    class="grade-input" />
+                <button class="add-btn" (click)="addGrade()">Add Grade</button>
+            </div>
+            
             <div class="grade-entry" *ngFor="let grade of filteredGrades">
                 <div class="student-info">
                     <span class="grade-date">{{ grade.date | date: 'mediumDate' }}</span>
+
+                    <p class="grade-student-name">{{grade.name}}</p>
                 </div>
 
 
@@ -23,17 +33,10 @@
                 </div>
 
                 <div class="grade-controls" *ngIf="editingGradeId === grade.id">
-                    <input type="number" [(ngModel)]="updatedValue" min="1" max="10" class="grade-input" />
+                    <input type="number" [(ngModel)]="updatedValue" min="1" max="10" class="grade-input" title="grade-input"/>
                     <button class="save-btn" (click)="updateGrade(grade.id)">Save</button>
                     <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
                 </div>
-            </div>
-
-            <div class="new-grade">
-                <input type="text" [(ngModel)]="newGrade.studentId" placeholder="Student ID" class="student-id-input" />
-                <input type="number" [(ngModel)]="newGrade.value" min="1" max="10" placeholder="Grade"
-                    class="grade-input" />
-                <button class="add-btn" (click)="addGrade()">Add Grade</button>
             </div>
         </div>
     </div>

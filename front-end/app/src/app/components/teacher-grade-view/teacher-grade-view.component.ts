@@ -47,8 +47,7 @@ export class TeacherGradeViewComponent implements OnInit {
   loadGrades(): void {
     this.api.getAllGradesForDiscipline(this.subjectId).subscribe({
       next: (data: any) => {
-        this.grades = data;
-        this.filteredGrades = [...this.grades];
+        this.filteredGrades = JSON.parse(data.message);
       },
       error: err => console.error('Failed to load grades', err)
     });
@@ -67,7 +66,7 @@ export class TeacherGradeViewComponent implements OnInit {
     // If you want to add filtering by student ID (since no name), update this accordingly
     const term = this.search.trim();
     this.filteredGrades = this.grades.filter(g =>
-      g.id.toString().includes(term) || g.value.toString().includes(term)
+      g.name.toString().includes(term) || g.value.toString().includes(term)
     );
   }
 

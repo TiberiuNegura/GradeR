@@ -25,7 +25,7 @@ export class ApiService {
 
   public getSubjects(isTeacher: boolean) {
     const params = {
-      id: localStorage.getItem('id'),
+      id: this.getIdFromSession(),
       role: isTeacher ? 'true' : 'false'
     }
     
@@ -34,22 +34,28 @@ export class ApiService {
 
   public getGradesBySubject(id: number) {
     const params = {
-      id: localStorage.getItem('id'),
+      id: this.getIdFromSession(),
       discipline_id: id
     };
 
-    return this.httpClient.post<GradeModel[]>(`${this.server}grades/by-discipline`, params);
+    return this.httpClient.post<GradeModel[]>(`${this.server}grades/by-discipline-student`, params);
   }
 
   public getAllGradesForDiscipline(subjectId: number) {
-    return this.httpClient.post(`${this.server}grades/by-discipline`, subjectId);
+    const params = {
+      id: this.getIdFromSession(),
+      discipline_id: subjectId
+    }
+
+    return this.httpClient.post<GradeModel[]>(`${this.server}grades/by-discipline-teacher`, params);
   }
 
   public addGrade(studentId: number, grade: number, subjectId: number) {
     const params = {
-      id: studentId,
+      teacher_id: this.getIdFromSession(),
+      student_id: studentId,
       discipline_id: subjectId,
-      subjectValue: grade
+      value: grade
     };
 
     return this.httpClient.post(`${this.server}grades/add`, params);
@@ -57,7 +63,7 @@ export class ApiService {
   
   public updateGrade(gradeId: number, newGrade: number) {
     const params = {
-      id: localStorage.getItem('id'),
+      id: this.getIdFromSession(),
       gradeValue: newGrade,
       gradeId: gradeId
     };
@@ -71,5 +77,9 @@ export class ApiService {
 
   public getAllStudentNames() {
     return this.httpClient.get<string[]>(`${this.server}students/name`);
+  }
+
+  private getIdFromSession(): number{ 
+    return parseInt(localStorage.getItem('id') ?? '0', 10)
   }
 }
