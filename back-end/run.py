@@ -189,6 +189,50 @@ def add_grade_endpoint():
 
     return build_response("Grade added successfully", 201)
 
+@app.route('/api/grades/<int:grade_id>', methods=['DELETE'])
+def delete_grade(grade_id):
+    success = User.delete_grade_record(grade_id)
+    if success:
+        return build_response(f"Grade {grade_id} deleted", 200)
+    else:
+        return build_response("Grade not found or could not be deleted", 404)
+
+@app.route('/api/grades/<int:grade_id>', methods=['PUT'])
+def update_grade(grade_id):
+    data = request.get_json()
+    new_value = data.get('value')
+    new_date = data.get('date')
+
+    if new_value is None or new_date is None:
+        return build_response("Value and date are required", 400)
+
+    success = User.update_grade_record(grade_id, new_value, new_date)
+    if success:
+        return build_response(f"Grade {grade_id} updated", 200)
+    else:
+        return build_response("Grade not found or could not be updated", 404)
+
+@app.route('/api/grades/search', methods=['POST'])
+def search_grades_by_name():
+    data = request.get_json()
+    search_term = data.get('name')
+
+    if not search_term:
+        return build_response("Search term required", 400)
+
+    grades = User.get_grades_by_student_name(search_term)
+    grade_list = []
+    for grade in grades:
+        grade_dict = {
+            "id_grade": grade[0],
+            "value": grade[1],
+            "date": grade[2].isoformat() if grade[2] else None,
+            "discipline": grade[3],
+            "student": f"{grade[4]} {grade[5]}"  # full name
+        }
+        grade_list.append(grade_dict)
+
+    return build_response(json.dumps(grade_list), 200)
 
 @app.route('/api/grades/teacher', methods=['POST'])
 def view_student_grades():
