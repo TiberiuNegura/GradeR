@@ -340,6 +340,18 @@ class User:
         conn.commit()
         cursor.close()
 
+    @staticmethod
+    def get_all_student_names():
+        cursor = conn.cursor()
+        query = """
+            SELECT first_name, last_name
+            FROM users
+            WHERE is_teacher = FALSE;
+        """
+        cursor.execute(query)
+        students = cursor.fetchall()
+        cursor.close()
 
+        return [f"{first} {last}" for first, last in students]
     def verify_password(self, password):
         return check_password_hash(self.password, password)

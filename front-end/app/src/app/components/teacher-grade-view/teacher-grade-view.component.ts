@@ -20,6 +20,8 @@ export class TeacherGradeViewComponent implements OnInit {
   grades: GradeModel[] = [];
   filteredGrades: GradeModel[] = [];
 
+  studentNames: string[] = [];
+
   newGrade = { studentId: '', value: '' };
   editingGradeId: number | null = null;
   updatedValue = '';
@@ -39,6 +41,7 @@ export class TeacherGradeViewComponent implements OnInit {
     if (teacher) this.teacher = teacher;
 
     this.loadGrades();
+    this.loadStudentsName();
   }
 
   loadGrades(): void {
@@ -49,6 +52,15 @@ export class TeacherGradeViewComponent implements OnInit {
       },
       error: err => console.error('Failed to load grades', err)
     });
+  }
+
+  loadStudentsName(): void {
+    this.api.getAllStudentNames().subscribe({
+      next: data => {
+        this.studentNames = data;
+      },
+      error: err => console.error('Failed to get all students names', err)
+    })
   }
 
   filterGrades(): void {

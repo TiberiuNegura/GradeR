@@ -68,4 +68,8 @@ export class ApiService {
   public deleteGrade(gradeId: number) {
     return this.httpClient.delete(`${this.server}grade/delete`);
   }
+
+  public getAllStudentNames() {
+    return this.httpClient.get<string[]>(`${this.server}students/name`);
+  }
 }

@@ -71,7 +71,7 @@ def login():
         lastName=user_data['last_name']
     )
 
-    #if not user.verify_password(password):
+    # if not user.verify_password(password):
     #    return build_response('Invalid credentials', 401)
 
     return jsonify({
@@ -237,6 +237,16 @@ def get_subjects():
     response.headers.add('Access-Control-Allow-Origin', '*')
 
     return response
+
+
+@app.route('/api/students/name', methods=['GET'])
+def get_student_names():
+    try:
+        student_names = User.get_all_student_names()
+
+        return build_response(json.dumps(student_names), 200)
+    except Exception as e:
+        return build_response(str(e), 500)
 
 
 if __name__ == '__main__':
