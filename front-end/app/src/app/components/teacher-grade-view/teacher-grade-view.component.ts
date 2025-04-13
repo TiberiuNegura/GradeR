@@ -19,6 +19,7 @@ export class TeacherGradeViewComponent implements OnInit {
   search = '';
   grades: GradeModel[] = [];
   filteredGrades: GradeModel[] = [];
+  ownsSubject: boolean = false;
 
   studentNames: string[] = [];
 
@@ -35,23 +36,36 @@ export class TeacherGradeViewComponent implements OnInit {
     const id = this.route.snapshot.queryParamMap.get('id');
     const name = this.route.snapshot.queryParamMap.get('name');
     const teacher = this.route.snapshot.queryParamMap.get('teacher');
+    const ownsSubject = this.route.snapshot.queryParamMap.get('subjectTeacher');
 
     if (id) this.subjectId = +id;
     if (name) this.subjectName = name;
     if (teacher) this.teacher = teacher;
+    if(ownsSubject) this.ownsSubject = ownsSubject == 'true';
 
     this.loadGrades();
     this.loadStudentsName();
+
+    console.log('ownsSubject?', this.ownsSubject);
   }
 
   loadGrades(): void {
     this.api.getAllGradesForDiscipline(this.subjectId).subscribe({
-      next: (data: any) => {
-        this.filteredGrades = JSON.parse(data.message);
+      next: (grades: any[]) => {
+        const parsedGrades = grades.map(g => ({
+          id: g.id,
+          value: typeof g.value === 'string' ? parseFloat(g.value) : g.value,
+          name: g.name,
+          date: g.date,
+        }));
+  
+        this.grades = parsedGrades;
+        this.filteredGrades = parsedGrades;
       },
       error: err => console.error('Failed to load grades', err)
     });
   }
+  
 
   loadStudentsName(): void {
     this.api.getAllStudentNames().subscribe({
@@ -105,7 +119,7 @@ export class TeacherGradeViewComponent implements OnInit {
       console.error('Invalid value');
       return;
     }
-
+    console.log(newValue)
     this.api.updateGrade(gradeId, newValue).subscribe({
       next: () => {
         this.editingGradeId = null;

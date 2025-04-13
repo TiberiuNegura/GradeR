@@ -64,15 +64,16 @@ export class ApiService {
   public updateGrade(gradeId: number, newGrade: number) {
     const params = {
       id: this.getIdFromSession(),
-      gradeValue: newGrade,
-      gradeId: gradeId
+      value: newGrade,
+      gradeId: gradeId,
+      date: new Date().toISOString()
     };
 
-    return this.httpClient.post(`${this.server}grades/update`, params);
+    return this.httpClient.put(`${this.server}grades/${gradeId}`, params);
   }
 
   public deleteGrade(gradeId: number) {
-    return this.httpClient.delete(`${this.server}grade/delete`);
+    return this.httpClient.delete(`${this.server}grades/${gradeId}`);
   }
 
   public getAllStudentNames() {

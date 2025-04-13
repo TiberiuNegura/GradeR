@@ -37,16 +37,14 @@ export class StudentGradeViewComponent implements OnInit {
   }
 
   loadGrades(): void {
-    const userId = localStorage.getItem('id');
     this.api.getGradesBySubject(this.subjectId).subscribe({
-      next: (data: any) => {
-        const parsed = JSON.parse(data.message);
-        this.grades = parsed.map((g: any) => ({
-          value: g.value,
+      next: (grades: any[]) => {
+        this.grades = grades.map(g => ({
+          value: typeof g.value === 'string' ? parseFloat(g.value) : g.value,
           date: g.date,
         }));
       },
       error: err => console.error('Failed to load grades', err)
     });
-  }
+  }  
 }

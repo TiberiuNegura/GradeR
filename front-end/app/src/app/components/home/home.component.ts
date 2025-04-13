@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { SubjectModel } from '../../models/SubjectModel';
-import { catchError, forkJoin, map, of } from 'rxjs';
+import { catchError, forkJoin, map, of, tap } from 'rxjs';
 import { GradeModel } from '../../models/GradeModel';
 
 interface SubjectWithGrades extends SubjectModel {
@@ -77,12 +77,8 @@ export class HomeComponent implements OnInit {
     const gradeRequests = this.studentSubjects.map(subj =>
       this.api.getGradesBySubject(subj.idDiscipline).pipe(
         catchError(() => of([] as GradeModel[])),
+        tap(grades => console.log('Grades received:', grades)), // <== Add this
         map((grades: GradeModel[]) => {
-          // Log grade values and their types for debugging
-          grades.forEach(g => {
-            console.log(`Grade for subject ${subj.name}: value = ${g.value}, type = ${typeof g.value}`);
-          });
-          // Convert all grade values to numbers (in case they're strings)
           const gradeValues = grades.map(g => {
             let value = g.value;
             if (typeof value === 'string') {
@@ -129,11 +125,13 @@ export class HomeComponent implements OnInit {
         }
       });
     } else {
+      console.log(subject.ownsSubject)
       this.router.navigate(['/teacher'], {
         queryParams: {
           id: subject.idDiscipline,
           name: subject.name,
-          teacher: subject.teacher
+          teacher: subject.teacher,
+          subjectTeacher: subject.ownsSubject
         }
       });
     }

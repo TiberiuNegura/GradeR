@@ -224,13 +224,10 @@ class User:
                 u.first_name || ' ' || u.last_name AS student_name,
                 g.date
             FROM grade g
-            JOIN discipline d ON g.id_discipline = d.id_discipline
             JOIN users u ON g.id_student = u.id_user
-            WHERE 
-                d.id_discipline = %s AND
-                d.id_teacher = %s;
+            WHERE g.id_discipline = %s;
         """
-        cursor.execute(query, (discipline_id, teacher_id))
+        cursor.execute(query, (discipline_id,))
         grades = cursor.fetchall()
         cursor.close()
 

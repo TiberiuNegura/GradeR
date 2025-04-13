@@ -138,7 +138,7 @@ def filter_student_grades_by_discipline():
     if not discipline_id and not student_id:
         return jsonify({"message": "Discipline and student id required", "code": 400}), 400
 
-    return build_response(json.dumps(User.get_student_grades_by_discipline(discipline_id, student_id)), 200)
+    return jsonify(User.get_student_grades_by_discipline(discipline_id, student_id)), 200
 
 
 @app.route('/api/grades/by-discipline-teacher', methods=['POST'])
@@ -150,7 +150,7 @@ def filter_grades_by_discipline_and_teacher():
     if not discipline_id and not teacher_id:
         return jsonify({"message": "Discipline and teacher id required", "code": 400}), 400
 
-    return build_response(json.dumps(User.get_grades_by_discipline_and_teacher(discipline_id, teacher_id)), 200)
+    return jsonify(User.get_grades_by_discipline_and_teacher(discipline_id, teacher_id)), 200
 
 
 @app.route('/api/grades/add', methods=['POST'])
@@ -187,6 +187,7 @@ def add_grade_endpoint():
 
     return build_response("Grade added successfully", 201)
 
+
 @app.route('/api/grades/<int:grade_id>', methods=['DELETE'])
 def delete_grade(grade_id):
     success = User.delete_grade_record(grade_id)
@@ -195,11 +196,14 @@ def delete_grade(grade_id):
     else:
         return build_response("Grade not found or could not be deleted", 404)
 
+
 @app.route('/api/grades/<int:grade_id>', methods=['PUT'])
 def update_grade(grade_id):
     data = request.get_json()
     new_value = data.get('value')
     new_date = data.get('date')
+
+    print(new_value)
 
     if new_value is None or new_date is None:
         return build_response("Value and date are required", 400)
@@ -209,6 +213,7 @@ def update_grade(grade_id):
         return build_response(f"Grade {grade_id} updated", 200)
     else:
         return build_response("Grade not found or could not be updated", 404)
+
 
 @app.route('/api/grades/search', methods=['POST'])
 def search_grades_by_name():
@@ -231,6 +236,7 @@ def search_grades_by_name():
         grade_list.append(grade_dict)
 
     return build_response(json.dumps(grade_list), 200)
+
 
 @app.route('/api/grades/teacher', methods=['POST'])
 def view_student_grades():

@@ -3,7 +3,7 @@
         <div class="subject-header">
             <div class="subject-title">
                 <h1>{{ subjectName }}</h1>
-                <p class="teacher-name">You are teaching this subject</p>
+                <p class="teacher-name" *ngIf="ownsSubject">You are teaching this subject</p>
             </div>
             <input type="text" [(ngModel)]="search" (input)="filterGrades()" placeholder="Search by student name..."
                 class="search-bar" />
@@ -11,7 +11,7 @@
 
         <div class="grades-container">
 
-            <div class="new-grade">
+            <div class="new-grade" *ngIf="ownsSubject">
                 <input type="text" [(ngModel)]="newGrade.studentId" placeholder="Student ID" class="student-id-input" />
                 <input type="number" [(ngModel)]="newGrade.value" min="1" max="10" placeholder="Grade"
                     class="grade-input" />
@@ -28,14 +28,14 @@
 
                 <div class="grade-controls" *ngIf="editingGradeId !== grade.id">
                     <span class="grade-display">{{ grade.value }}</span>
-                    <button class="update-btn" (click)="startEdit(grade)">Edit</button>
-                    <button class="delete-btn" (click)="deleteGrade(grade.id)">Delete</button>
+                    <button class="update-btn" *ngIf="ownsSubject" (click)="startEdit(grade)" >Edit</button>
+                    <button class="delete-btn" *ngIf="ownsSubject" (click)="deleteGrade(grade.id)">Delete</button>
                 </div>
 
                 <div class="grade-controls" *ngIf="editingGradeId === grade.id">
                     <input type="number" [(ngModel)]="updatedValue" min="1" max="10" class="grade-input" title="grade-input"/>
-                    <button class="save-btn" (click)="updateGrade(grade.id)">Save</button>
-                    <button class="cancel-btn" (click)="cancelEdit()">Cancel</button>
+                    <button class="save-btn" *ngIf="ownsSubject" (click)="updateGrade(grade.id)">Save</button>
+                    <button class="cancel-btn" *ngIf="ownsSubject" (click)="cancelEdit()">Cancel</button>
                 </div>
             </div>
         </div>
